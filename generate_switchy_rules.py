@@ -1,7 +1,7 @@
 import requests
 
 # URL файла со списком доменов
-GITHUB_URL = "https://github.com/1andrevich/Re-filter-lists/blob/main/community.lst"  # Замени на реальный URL
+GITHUB_URL = "https://github.com/1andrevich/Re-filter-lists/blob/main/ooni_domains.lst"  # Замени на реальный URL
 
 # Имя выходного файла
 OUTPUT_FILE = "switchy_omega_rules.txt"
