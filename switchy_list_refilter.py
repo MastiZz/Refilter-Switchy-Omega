@@ -1,5 +1,6 @@
 import requests
 from datetime import datetime
+import re
 
 # URLs для скачивания списков
 url_main = "https://community.antifilter.download/list/domains.txt"  # URL основного списка
@@ -21,13 +22,16 @@ def download_list(url):
         return []
 
 def parse_switchy_lines(lines):
-    """Парсит строки Switchy Omega и извлекает домены."""
+    """Парсит строки Switchy Omega, извлекает и проверяет домены."""
     domains = set()
+    domain_pattern = re.compile(r"^\*://\*\.[a-zA-Z0-9-]+\.[a-zA-Z]{2,}/\*$")  # Проверяем формат доменов
     for line in lines:
         line = line.strip()
-        if line.startswith("*://*.") and line.endswith("/*"):  # Проверяем формат
+        if domain_pattern.match(line):  # Если строка соответствует формату
             domain = line[7:-2]  # Извлекаем домен без *://*. и /*
             domains.add(domain)
+        else:
+            print(f"Пропущена некорректная строка: {line}")
     return domains
 
 def save_to_file(filename, domains):
