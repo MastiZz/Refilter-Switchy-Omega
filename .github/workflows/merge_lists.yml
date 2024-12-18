@@ -1,4 +1,4 @@
-name: Merge Switchy Omega Lists
+name: Update, Refilter, and Merge Switchy Omega Lists
 
 on:
   schedule:
@@ -6,32 +6,37 @@ on:
   workflow_dispatch:      # Возможность ручного запуска
 
 jobs:
-  merge-lists:
+  update-refilter:
     runs-on: ubuntu-latest
 
     steps:
+      # Шаг 1: Клонирование репозитория
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Шаг 2: Установка Python
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
+      # Шаг 3: Установка зависимостей
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install requests
 
-      - name: Run script to merge lists
-        run: python switchy_list_merger.py
+      # Шаг 4: Запуск скрипта для скачивания, обработки и объединения списков
+      - name: Run Switchy Omega Script
+        run: python switchy_list_refilter.py
 
+      # Шаг 5: Коммит и пуш изменений
       - name: Commit and push changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions@github.com"
-          git add combined_switchy_list.txt
-          git commit -m "Automated update: Combined Switchy Omega list"
+          git add "Refilter+antifilter community.txt"
+          git commit -m "Automated refilter and merge: Switchy Omega lists"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

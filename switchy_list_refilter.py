@@ -1,12 +1,12 @@
 import requests
 from datetime import datetime
 
-# URLs списков
+# URLs для скачивания списков
 url_main = "https://community.antifilter.download/list/domains.txt"  # URL основного списка
 url_community = "https://raw.githubusercontent.com/MastiZz/Refilter-Switchy-Omega/main/community.txt"  # URL community списка
 
-# Выходной файл
-output_file = "combined_switchy_list.txt"
+# Имя итогового файла
+output_file = "Refilter+antifilter community.txt"
 
 def download_list(url):
     """Скачивает список доменов по URL."""
@@ -31,7 +31,7 @@ def parse_switchy_lines(lines):
     return domains
 
 def save_to_file(filename, domains):
-    """Сохраняет объединённый список в файл с заголовком и временем создания."""
+    """Сохраняет список доменов в файл с заголовком и временем создания."""
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Текущее время
     with open(filename, "w", encoding="utf-8") as file:
         file.write("#BEGIN\n\n[Wildcard]\n")  # Заголовок
@@ -39,24 +39,24 @@ def save_to_file(filename, domains):
             file.write(f"*://*.{domain}/*\n")
         file.write("#END\n")  # Завершающая строка
         file.write(f"# List created on {now}\n")  # Дата и время создания
-    print(f"Объединённый список сохранён в {filename}")
+    print(f"Итоговый список сохранён в {filename}")
 
-def process_lists(url1, url2, output_file):
-    """Скачивает два списка, объединяет их и сохраняет результат."""
+def process_and_refilter(url1, url2, output_file):
+    """Обрабатывает два списка, убирает дубликаты и сохраняет результат."""
     # Скачиваем списки
-    list1 = download_list(url1)
-    list2 = download_list(url2)
+    main_list = download_list(url1)
+    community_list = download_list(url2)
 
-    # Парсим домены из обоих списков
-    domains1 = parse_switchy_lines(list1)
-    domains2 = parse_switchy_lines(list2)
+    # Парсим домены
+    main_domains = parse_switchy_lines(main_list)
+    community_domains = parse_switchy_lines(community_list)
 
-    # Объединяем и удаляем дубликаты
-    combined_domains = domains1.union(domains2)
-    print(f"Объединено {len(combined_domains)} уникальных доменов.")
+    # Убираем дубликаты между списками
+    unique_domains = main_domains.union(community_domains)  # Объединяем списки
+    print(f"Объединено {len(unique_domains)} уникальных доменов.")
 
-    # Сохраняем результат
-    save_to_file(output_file, combined_domains)
+    # Сохраняем итоговый список
+    save_to_file(output_file, unique_domains)
 
 if __name__ == "__main__":
-    process_lists(url_main, url_community, output_file)
+    process_and_refilter(url_main, url_community, output_file)
