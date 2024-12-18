@@ -6,7 +6,7 @@ url_main = "https://community.antifilter.download/list/domains.txt"  # URL ос�
 url_community = "https://raw.githubusercontent.com/MastiZz/Refilter-Switchy-Omega/main/community.txt"  # URL community списка
 
 # Выходной файл
-output_file = "Refilter+antifilter.txt"
+output_file = "combined_switchy_list.txt"
 
 def download_list(url):
     """Скачивает список доменов по URL."""
