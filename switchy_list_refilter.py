@@ -21,46 +21,54 @@ def download_list(url):
         print(f"Ошибка при скачивании списка: {e}")
         return []
 
-def parse_switchy_lines(lines):
-    """Парсит строки Switchy Omega, извлекает и проверяет домены."""
+def extract_domains(lines):
+    """Извлекает домены из формата Switchy Omega."""
     domains = set()
-    domain_pattern = re.compile(r"^\*://\*\.[a-zA-Z0-9-]+\.[a-zA-Z]{2,}/\*$")  # Проверяем формат доменов
+    domain_pattern = re.compile(r"^\*://\*\.(.+)/\*$")  # Регулярка для извлечения доменов
     for line in lines:
         line = line.strip()
-        if domain_pattern.match(line):  # Если строка соответствует формату
-            domain = line[7:-2]  # Извлекаем домен без *://*. и /*
-            domains.add(domain)
+        match = domain_pattern.match(line)
+        if match:
+            domains.add(match.group(1))  # Добавляем только домен
         else:
             print(f"Пропущена некорректная строка: {line}")
     return domains
 
-def save_to_file(filename, domains):
-    """Сохраняет список доменов в файл с заголовком и временем создания."""
+def convert_to_switchy(domains):
+    """Преобразует домены в формат Switchy Omega."""
+    switchy_lines = ["#BEGIN\n\n[Wildcard]\n"]
+    for domain in sorted(domains):  # Сортируем для порядка
+        switchy_lines.append(f"*://*.{domain}/*\n")
+    switchy_lines.append("#END\n")
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Текущее время
+    switchy_lines.append(f"# List created on {now}\n")
+    return switchy_lines
+
+def save_to_file(filename, lines):
+    """Сохраняет строки в файл."""
     with open(filename, "w", encoding="utf-8") as file:
-        file.write("#BEGIN\n\n[Wildcard]\n")  # Заголовок
-        for domain in sorted(domains):  # Сортируем для порядка
-            file.write(f"*://*.{domain}/*\n")
-        file.write("#END\n")  # Завершающая строка
-        file.write(f"# List created on {now}\n")  # Дата и время создания
+        file.writelines(lines)
     print(f"Итоговый список сохранён в {filename}")
 
 def process_and_refilter(url1, url2, output_file):
-    """Обрабатывает два списка, убирает дубликаты и сохраняет результат."""
+    """Скачивает, обрабатывает списки и сохраняет результат."""
     # Скачиваем списки
     main_list = download_list(url1)
     community_list = download_list(url2)
 
-    # Парсим домены
-    main_domains = parse_switchy_lines(main_list)
-    community_domains = parse_switchy_lines(community_list)
+    # Извлекаем домены
+    main_domains = extract_domains(main_list)
+    community_domains = extract_domains(community_list)
 
-    # Убираем дубликаты между списками
-    unique_domains = main_domains.union(community_domains)  # Объединяем списки
+    # Убираем дубликаты
+    unique_domains = main_domains.union(community_domains)
     print(f"Объединено {len(unique_domains)} уникальных доменов.")
 
+    # Преобразуем в формат Switchy Omega
+    switchy_lines = convert_to_switchy(unique_domains)
+
     # Сохраняем итоговый список
-    save_to_file(output_file, unique_domains)
+    save_to_file(output_file, switchy_lines)
 
 if __name__ == "__main__":
     process_and_refilter(url_main, url_community, output_file)
