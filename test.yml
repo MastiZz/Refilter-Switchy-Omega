@@ -1,0 +1,12 @@
+name: Test Cron
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"  # Каждые 5 минут
+
+jobs:
+  test-cron:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print timestamp
+        run: date
