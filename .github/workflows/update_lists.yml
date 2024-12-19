@@ -5,6 +5,9 @@ on:
     - cron: "0 0 * * *" # Запуск ежедневно в 00:00 UTC
   workflow_dispatch:  # Ручной запуск
 
+permissions:
+  contents: write
+
 jobs:
   update-lists:
     runs-on: ubuntu-latest
