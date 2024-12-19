@@ -2,11 +2,8 @@ name: Update Switchy Omega Lists
 
 on:
   schedule:
-    - cron: "*/5 * * * *" # Запуск ежедневно в 00:00 UTC
+    - cron: "0 0 * * *" # Запуск ежедневно в 00:00 UTC
   workflow_dispatch:  # Ручной запуск
-
-permissions:
-  contents: write
 
 jobs:
   update-lists:
